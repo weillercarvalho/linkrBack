@@ -34,12 +34,12 @@ function getUserIdByName(userName) {
 function getUserIdByPostId(postId) {
   return connection.query(
     `
-        select u.id 
-        from users u 
-        join posts p on p."userId" = u.id 
-        where p.id = $1
-        ;
-        `,
+    select u.id 
+    from users u 
+    join posts p on p."userId" = u.id 
+    where p.id = $1
+    ;
+    `,
     [postId]
   );
 }
