@@ -13,9 +13,9 @@ function getPostsByUserId(userId) {
       l1."userLikedId" as "IdLiked", 
       u2."name" as "LikedName"
     from posts p
-    join users u1 on u1.id = p."userId" 
-    join likes l1 on p.id = l1."postId"
-    join users u2 on u2.id = l1."userLikedId"
+    full outer join users u1 on u1.id = p."userId" 
+    full outer join likes l1 on p.id = l1."postId"
+    full outer join users u2 on u2.id = l1."userLikedId"
     where p."userId" = $1
     group by u1."name", u1.picture, p.message, p.link, l1."userLikedId", u2."name", p.id 
     ;
@@ -31,7 +31,7 @@ function getLikesByUserId(userId) {
       p.id as "postId", 
       count(l."postId") as "Likes"
     from likes l
-    join posts p on p.id = l."postId" 
+    full outer join posts p on p.id = l."postId" 
     where p."userId" = $1
     group by l."postId", p.id 
     ;

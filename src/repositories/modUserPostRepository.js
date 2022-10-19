@@ -35,3 +35,9 @@ function deletePostByPostId(postId) {
     [postId]
   );
 }
+
+export default modUserPostRepository = {
+  searchPostByPostId,
+  updatePostByPostId,
+  deletePostByPostId,
+};
