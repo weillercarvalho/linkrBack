@@ -12,6 +12,3 @@ redirectToUserRouter.get('/findname', validateToken, findUsersByName);
 redirectToUserRouter.get('/findpost', validateToken, findUserByPost);
 
 export default redirectToUserRouter;
-
-//Comments:
-// ++ Need validateToken middleware

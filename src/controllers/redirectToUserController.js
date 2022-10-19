@@ -9,8 +9,10 @@ export async function LoadUserPosts(req, res) {
     if (!userPosts) {
       return res.sendStatus(STATUS_CODE.NOT_FOUND);
     }
+    let userLikes = await redirectToUserRepository.getLikesByUserId(userId);
+    userLikes = userLikes.rows;
 
-    return res.status(STATUS_CODE.OK).send(userPosts);
+    return res.status(STATUS_CODE.OK).send({ userPosts, userLikes });
   } catch (error) {
     console.log(error);
     return res.send(STATUS_CODE.SERVER_ERROR);
