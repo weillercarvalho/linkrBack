@@ -20,6 +20,7 @@ server.get("/status", (req, res) => {
   res.send("ok");
 });
 
+
 const isValidUrl = (urlString) => {
     let urlPattern = new RegExp(
       "^(https?:\\/\\/)?" +
