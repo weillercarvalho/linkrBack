@@ -5,6 +5,8 @@ import { connection } from "./database/db.js";
 
 import routerAuth from "./routes/signRoutes.js";
 import routerlogaut from "./routes/logoutRoute.js";
+import likeRouter from "./routes/likeRoute.js";
+import hashtagRouter from "./routes/hashtagRoute.js"
 
 dotenv.config();
 
@@ -14,6 +16,8 @@ server.use(express.json());
 
 server.use(routerAuth);
 server.use(routerlogaut);
+server.use(likeRouter);
+server.use(hashtagRouter);
 
 server.get("/status", (req, res) => {
   res.send("ok");
