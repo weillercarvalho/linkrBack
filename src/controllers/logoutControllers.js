@@ -1,4 +1,5 @@
-import { connection } from "../database/db.js";
+import logout from "../repositories/logoutRepositories.js";
+
 async function deleteSession(req, res) {
   const token = req.headers.authorization?.replace("Bearer ", "");
 
@@ -6,12 +7,13 @@ async function deleteSession(req, res) {
     return res.sendStatus(401);
   }
 
-  await connection.query(
-    `UPDATE sessions SET "isValid" = false WHERE token = $1;`,
-    [token]
-  );
-
-  res.status(200).send("logged out user");
+  try {
+    await logout({ token });
+    res.status(200).send("logged out user");
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
 }
 
 export { deleteSession };
