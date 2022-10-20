@@ -17,3 +17,7 @@ server.use(timelinerouter);
 server.get("/status", (req, res) => {
   res.send("ok");
 });
+
+server.listen(process.env.PORT,() => {
+  console.log(`Listening on the ${process.env.PORT} port`)
+})
