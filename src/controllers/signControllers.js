@@ -4,11 +4,7 @@ import * as signRepositories from "../repositories/signRepositories.js";
 import bcrypt from "bcrypt";
 
 async function postSignup(req, res) {
-  const { name, email, password, confirmPassword, picture } = req.body;
-
-  if (password !== confirmPassword) {
-    return res.status(409).send({ erro: "incompatible passwords!" });
-  }
+  const { name, email, password, picture } = req.body;
 
   try {
     const findEmail = (

@@ -4,7 +4,6 @@ const postSignupSchema = joi.object({
   name: joi.string().trim().required(),
   email: joi.string().email().trim().required(),
   password: joi.string().min(5).required(),
-  confirmPassword: joi.string().min(5).required(),
   picture: joi.string().uri().required(),
 });
 
