@@ -1,0 +1,39 @@
+{
+  "name": "projeto17-linkrback",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "./src/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/weillercarvalho/LinkrBack.git"
+  },
+  "keywords": [
+    "HTML",
+    "CSS",
+    "NodeJS",
+    "Express",
+    "React",
+    "PostgreSQL"
+  ],
+  "author": "Weiller Carvalho, Leonardo Silva, Henrique Okuti, Daivison Morais",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/weillercarvalho/LinkrBack/issues"
+  },
+  "homepage": "https://github.com/weillercarvalho/LinkrBack#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "joi": "^17.6.3",
+    "jsonwebtoken": "^8.5.1",
+    "pg": "^8.8.0",
+    "uuid": "^9.0.0"
+  }
+}
