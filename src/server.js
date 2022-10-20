@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { connection } from "./database/db.js";
 
 import routerAuth from "./routes/signRoutes.js";
+import routerlogaut from "./routes/logoutRoute.js";
 
 dotenv.config();
 
@@ -12,6 +13,7 @@ server.use(cors());
 server.use(express.json());
 
 server.use(routerAuth);
+server.use(routerlogaut);
 
 server.get("/status", (req, res) => {
   res.send("ok");
