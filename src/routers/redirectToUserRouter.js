@@ -13,6 +13,6 @@ redirectToUserRouter.get('/findname', findUsersByName);
 redirectToUserRouter.get('/findpost', findUserByPost);
 redirectToUserRouter.get('/finduser', findUserByID);
 
-//!IMPORTANT! ADD validateToken middleware
+//!IMPORTANT! ADD validateToken middleware on all routes
 
 export default redirectToUserRouter;
