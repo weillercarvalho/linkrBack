@@ -6,8 +6,7 @@ async function hashtagList() {
     name, 
     COUNT(*) AS "postCount" 
     FROM posthashtag 
-    LEFT JOIN hashtags 
-    ON posthashtag."hashtagId" = hashtags.id 
+    LEFT JOIN hashtags ON posthashtag."hashtagId" = hashtags.id 
     GROUP BY name 
     ORDER BY "postCount" DESC 
     LIMIT 10;
