@@ -1,15 +1,15 @@
 import { connection } from "../database/db.js";
 
-async function likerPost({ userId, postId }) {
+async function likerPost(userId, postId) {
     await connection.query(
-      `INSERT INTO likes ("userId", "postId") VALUES ($1, $2);`,
+      `INSERT INTO likes ("userLikedId", "postId") VALUES ($1, $2);`,
       [userId, postId]
     );
   };
 
-async function isLiked({ userId, postId }) {
+async function isLiked(userId, postId) {
     const like = await connection.query(
-      `SELECT * FROM likes WHERE "userId" = $1 AND "postId" = $2`,
+      `SELECT * FROM likes WHERE "userLikedId" = $1 AND "postId" = $2`,
       [userId, postId]
     );
     if(like.rowCount > 0){
@@ -17,4 +17,11 @@ async function isLiked({ userId, postId }) {
     }else return false;
   };
 
-export {likerPost, isLiked};
+async function dislikePost(userId, postId) {
+  await connection.query(
+    `DELETE FROM likes WHERE "userLikedId" = $1 AND "postId" = $2`,
+    [userId, postId]
+  );
+};
+
+export {likerPost, isLiked, dislikePost};
