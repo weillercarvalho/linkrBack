@@ -70,9 +70,17 @@ function getUserIdByPostId(postId) {
   );
 }
 
-export default redirectToUserRepository = {
+//Returns user info when searching for u.id === userId
+function getUserInfoByUserId(userId) {
+  return connection.query(`select * from users u where u.id = $1`, [userId]);
+}
+
+const redirectToUserRepository = {
   getPostsByUserId,
   getLikesByUserId,
   getUserIdByName,
   getUserIdByPostId,
+  getUserInfoByUserId,
 };
+
+export default redirectToUserRepository;

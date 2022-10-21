@@ -1,4 +1,4 @@
-import { connection } from '../db/connection.js';
+import { connection } from '../database/db.js';
 
 async function queryGetSessionByToken(token) {
   return connection.query(`SELECT *  FROM sessions WHERE token = $1;`, [token]);
