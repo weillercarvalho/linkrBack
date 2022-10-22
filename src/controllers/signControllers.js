@@ -38,13 +38,13 @@ async function postSignin(req, res) {
       await connection.query(`SELECT * FROM users WHERE email = $1;`, [email])
     ).rows;
 
-    const isValid = bcrypt.compareSync(password, findUser[0].password);
-    if (!isValid) {
+    if (findUser.length === 0) {
       return res.status(401).send({ error: "Invalid email or password" });
     }
 
-    if (findUser.length === 0) {
-      return res.status(401).send({ error: "email not registered" });
+    const isValid = bcrypt.compareSync(password, findUser[0].password);
+    if (!isValid) {
+      return res.status(401).send({ error: "Invalid email or password" });
     }
 
     const existingSession = await connection.query(
