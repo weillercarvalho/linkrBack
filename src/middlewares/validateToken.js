@@ -1,3 +1,4 @@
+import { STATUS_CODE } from '../enums/statusCodes.js';
 import tokenRepository from '../repositories/tokenRepository.js';
 
 export async function validateToken(req, res, next) {
