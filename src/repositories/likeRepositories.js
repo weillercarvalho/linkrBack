@@ -24,4 +24,9 @@ async function dislikePost(userId, postId) {
   );
 };
 
-export {likerPost, isLiked, dislikePost};
+async function findUser(token){
+  const id = await connection.query(`SELECT "userId" FROM sessions WHERE token = $1`, [token]);
+  return id.rows[0].userId;
+}
+
+export {likerPost, isLiked, dislikePost, findUser};

@@ -1,4 +1,5 @@
 import {connection} from "../database/db.js";
+import { findUser, isLiked } from "../repositories/likeRepositories.js";
 import {insertPost, getPost, getPictures} from "../repositories/timelineRepositories.js"
 
 async function postTimeline(req,res) {
@@ -27,12 +28,29 @@ async function postTimeline(req,res) {
 
 }
 
+//leo: Quero Discutir com o grupo.
 async function getTimeline(req,res) {
+    //const {authorization}  = req.headers;
+    //const token = authorization?.replace(`Bearer `, ``);
 
     try {
       const query = await getPost();
-      return res.send(query.rows)
+      //if(!token){
+        return res.send(query.rows)
+      //}
+      /*const userId = await findUser(token);
+      const postsIds = [];
+      query.rows.map(value=> postsIds.push(value.id))
+      const list = postsIds.map(async value=> await isLiked(userId, value))
+      const timeLine = [];
+      query.rows.map((values,id)=>timeLine.push({
+        ...values,
+        liked: list[id]
+      }));
+      console.log(list);
+      return res.send(timeLine);*/
     } catch (error) {
+      console.log(error)
       return res.status(500).send({message: "An error occured while trying to fetch the posts, please refresh the page"})
     }
 }
