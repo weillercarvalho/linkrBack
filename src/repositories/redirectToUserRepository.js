@@ -18,6 +18,8 @@ function getPostsByUserId(userId) {
     full outer join users u2 on u2.id = l1."userLikedId"
     where p."userId" = $1
     group by u1."name", u1.picture, p.message, p.link, l1."userLikedId", u2."name", p.id 
+    order by p.id desc
+    limit 20
     ;
     `,
     [userId]
@@ -50,6 +52,7 @@ function getUserIdByName(userName) {
       u.picture  
     from users u 
     where u."name" ilike $1
+    limit 6
     ;
     `,
     [userName]
