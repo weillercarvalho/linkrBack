@@ -2,22 +2,22 @@ import {connection} from "../database/db.js";
 import {insertPost, getPost, getPictures} from "../repositories/timelineRepositories.js"
 
 async function postTimeline(req,res) {
-    // const {authorization}  = req.headers;
+    const {authorization}  = req.headers;
     const {message, link} = req.body;
-    // const token = authorization?.replace(`Bearer `, ``);
-    // if(!token) {
-    //     return res.sendStatus(409);
-    // }
+    const token = authorization?.replace(`Bearer `, ``);
+    if(!token) {
+        return res.sendStatus(409);
+    }
 
     try {
         const gettingUserId = await connection.query(`SELECT * FROM sessions ORDER BY id DESC LIMIT 1`);
-        // const gettinToken = gettingUserId.rows[0].token
-        // if (gettinToken !== token) {
-        //     return res.sendStatus(409);
-        // }
-        // if(!isValidUrl(link)) {
-        //     return res.sendStatus(422)
-        // }
+        const gettinToken = gettingUserId.rows[0].token
+        if (gettinToken !== token) {
+            return res.sendStatus(409);
+        }
+        if(!isValidUrl(link)) {
+            return res.sendStatus(422)
+        }
         const useridinsert = gettingUserId.rows[0].userId;
         const query = await insertPost(message,link,useridinsert)
         return res.send(201)
