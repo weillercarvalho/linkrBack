@@ -1,12 +1,14 @@
-const { Router } = require('express');
+import { Router } from 'express';
 import {
   updatePost,
   deletePost,
+  fetchUserId,
 } from '../controllers/modUserPostController.js';
 import { validateToken } from '../middlewares/validateToken.js';
 
-const redirectToUserRouter = Router();
-redirectToUserRouter.put('/users/:id', validateToken, updatePost);
-redirectToUserRouter.put('/users/:id', validateToken, deletePost);
+const modUserPostRouter = Router();
+modUserPostRouter.put('/update', validateToken, updatePost);
+modUserPostRouter.put('/delete', validateToken, deletePost);
+modUserPostRouter.get('/fetchLoggedUserId', validateToken, fetchUserId);
 
-export default redirectToUserRouter;
+export default modUserPostRouter;

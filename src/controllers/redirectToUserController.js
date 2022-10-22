@@ -66,9 +66,11 @@ export async function findUserByID(req, res) {
       return res.sendStatus(STATUS_CODE.NOT_FOUND);
     }
     userInfo = userInfo[0];
-    return res
-      .status(STATUS_CODE.OK)
-      .send({ name: userInfo.name, picture: userInfo.picture });
+    return res.status(STATUS_CODE.OK).send({
+      id: userInfo.id,
+      name: userInfo.name,
+      picture: userInfo.picture,
+    });
   } catch (error) {
     console.log(error);
     return res.send(STATUS_CODE.SERVER_ERROR);
