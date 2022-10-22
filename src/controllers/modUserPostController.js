@@ -27,6 +27,7 @@ export async function updatePost(req, res) {
 export async function deletePost(req, res) {
   const { user } = res.locals;
   const { postId } = req.body;
+
   if (!postId) {
     return res.sendStatus(STATUS_CODE.NO_CONTENT);
   }
@@ -41,6 +42,16 @@ export async function deletePost(req, res) {
     }
     await modUserPostRepository.deletePostByPostId(postId);
     return res.sendStatus(STATUS_CODE.OK);
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(STATUS_CODE.SERVER_ERROR);
+  }
+}
+
+export async function fetchUserId(req, res) {
+  try {
+    const userId = res.locals.user.id;
+    return res.send({ userId: userId });
   } catch (error) {
     console.log(error);
     return res.sendStatus(STATUS_CODE.SERVER_ERROR);

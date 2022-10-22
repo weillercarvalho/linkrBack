@@ -4,13 +4,11 @@ import redirectToUserRepository from '../repositories/redirectToUserRepository.j
 export async function LoadUserPosts(req, res) {
   const { id } = req.params;
   const userId = id;
-
   if (!userId || !Number(userId)) {
     return res
       .send({ error: 'not a valid user' })
       .status(STATUS_CODE.BAD_REQUEST);
   }
-
   try {
     let userPosts = await redirectToUserRepository.getPostsByUserId(userId);
     userPosts = userPosts.rows;
@@ -19,7 +17,6 @@ export async function LoadUserPosts(req, res) {
     }
     let userLikes = await redirectToUserRepository.getLikesByUserId(userId);
     userLikes = userLikes.rows;
-
     return res.status(STATUS_CODE.OK).send({ userPosts, userLikes });
   } catch (error) {
     console.log(error);
@@ -50,7 +47,6 @@ export async function findUserByPost(req, res) {
     if (!userId) {
       return res.sendStatus(STATUS_CODE.NOT_FOUND);
     }
-
     return res.status(STATUS_CODE.OK).send(userId);
   } catch (error) {
     console.log(error);
@@ -70,9 +66,11 @@ export async function findUserByID(req, res) {
       return res.sendStatus(STATUS_CODE.NOT_FOUND);
     }
     userInfo = userInfo[0];
-    return res
-      .status(STATUS_CODE.OK)
-      .send({ name: userInfo.name, picture: userInfo.picture });
+    return res.status(STATUS_CODE.OK).send({
+      id: userInfo.id,
+      name: userInfo.name,
+      picture: userInfo.picture,
+    });
   } catch (error) {
     console.log(error);
     return res.send(STATUS_CODE.SERVER_ERROR);
