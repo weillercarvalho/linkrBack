@@ -21,7 +21,7 @@ async function isThereHashtag(str){
         [str]);
     
     if(hashtags.rowCount > 0){
-        return true;
+        return hashtags.rows[0].id;
     }else return false;
 
 };
@@ -30,7 +30,31 @@ async function addHashtag(str){
     await connection.query(
         `INSERT INTO hashtags (name) VALUES($1);`,
         [str]);
+    const hashtagId = await connection.query(
+        `SELECT id FROM hashtags WHERE name = $1;`,
+        [str]
+    );
+    return hashtagId.rows[0].id;
     
 }
 
-export {hashtagList, isThereHashtag, addHashtag};
+async function hashtagPosts(str){
+    const list = await connection.query(`
+    SELECT posts.id, "hashtagId", message, link, "userId", "createdAt"
+    FROM postHashtag 
+    JOIN posts ON postHashtag."postId" = posts.id
+    WHERE "hashtagId" = $1
+    ORDER BY postHashtag.id DESC;    
+    `,[str]);
+
+    return list.rows;
+}
+
+async function addRelationPostHashtag(postId, hashtagId){
+    await connection.query(
+        `INSERT INTO postHashtag ("postId", "hashtagId")
+        VALUES($1, $2);`, [postId, hashtagId]
+    )
+}
+
+export {hashtagList, isThereHashtag, addHashtag, hashtagPosts, addRelationPostHashtag};

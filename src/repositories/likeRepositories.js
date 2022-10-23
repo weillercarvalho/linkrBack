@@ -29,4 +29,28 @@ async function findUser(token){
   return id.rows[0].userId;
 }
 
-export {likerPost, isLiked, dislikePost, findUser};
+async function findUserLikes(userId){
+  const id = await connection.query(`SELECT * FROM likes WHERE "userLikedId" = $1`, [userId]);
+  const posts ={};
+  for (let index = 0; index < id.rows.length; index++) {
+    const element = id.rows[index];
+    posts[element.postId] = 1;  
+  }
+  return posts;
+}
+
+async function totalLikes(){
+  const list  = await connection.query(
+    `SELECT "postId", COUNT(*) 
+    FROM likes GROUP BY "postId";`
+  )
+  const totalList={};
+  for (let index = 0; index < list.rows.length; index++) {
+    const element = list.rows[index];
+    totalList[element.postId] = element.count;
+  }
+  return totalList
+}
+
+
+export {likerPost, isLiked, dislikePost, findUser, findUserLikes, totalLikes};

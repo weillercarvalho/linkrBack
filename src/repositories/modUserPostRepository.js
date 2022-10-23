@@ -29,15 +29,17 @@ function updatePostByPostId(newMessage, postId) {
 function deletePostByPostId(postId) {
   return connection.query(
     `
-      delete posts 
+      delete from posts 
       where id = $1;	
       `,
     [postId]
   );
 }
 
-export default modUserPostRepository = {
+const modUserPostRepository = {
   searchPostByPostId,
   updatePostByPostId,
   deletePostByPostId,
 };
+
+export default modUserPostRepository;
