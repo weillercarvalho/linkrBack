@@ -1,9 +1,20 @@
-import { isLiked, likerPost, dislikePost } from "../repositories/likeRepositories.js";
+import { isLiked, likerPost, dislikePost, findUser } from "../repositories/likeRepositories.js";
 
 async function insertLike(req, res){
-    const {userId, postId} = req.body;
+    const { authorization } = req.headers;
+    const token = authorization?.replace(`Bearer `, ``);
+    const {postId} = req.body;
+
+    if(!token){
+        return res.sendStatus(401);
+    }
+
 
     try{
+        const userId = await findUser(token);
+        if(!userId){
+            return res.sendStatus(401);
+        } 
         const liked = await isLiked(userId, postId);
         if(liked){
             return res.status(409).send("Post already liked!");
@@ -20,9 +31,19 @@ async function insertLike(req, res){
 };
 
 async function dislike(req, res){
-    const {userId, postId} = req.body;
+    const { authorization } = req.headers;
+    const token = authorization?.replace(`Bearer `, ``);
+    const {postId} = req.body;
+
+    if(!token){
+        return res.sendStatus(401);
+    }
 
     try{
+        const userId = await findUser(token);
+        if(!userId){
+            return res.sendStatus(401);
+        } 
         const liked = await isLiked(userId, postId);
         if(!liked){
             return res.status(404).send("Post not liked!");

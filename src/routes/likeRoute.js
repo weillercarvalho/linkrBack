@@ -5,6 +5,6 @@ import { insertLike, dislike } from '../controllers/likeController.js';
 const likeRouter = express.Router();
 
 likeRouter.post("/like", likerSchema, insertLike);
-likeRouter.delete("/like", likerSchema, dislike);
+likeRouter.put("/like", likerSchema, dislike);
 
 export default likeRouter;
