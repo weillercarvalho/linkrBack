@@ -1,11 +1,20 @@
 import { connection } from '../database/db.js';
 
 async function insertPost(message, link, useridinsert) {
-  const query = await connection.query(
+  await connection.query(
     `INSERT INTO posts (message,link,"userId") VALUES ($1,$2,$3)`,
     [message, link, useridinsert]
   );
-  return query;
+
+  const idPost = await connection.query(
+    `SELECT id 
+    FROM posts 
+    WHERE "userId" = $1 AND link = $2 AND message = $3
+    ORDER BY id DESC
+    LIMIT 1;`,[useridinsert, link, message]
+  );
+  console.log(idPost.rows[0].id)
+  return idPost.rows[0].id;
 }
 
 async function getPost() {
