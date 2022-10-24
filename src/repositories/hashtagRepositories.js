@@ -40,14 +40,26 @@ async function addHashtag(str){
 
 async function hashtagPosts(str){
     const list = await connection.query(`
-    SELECT posts.id, "hashtagId", message, link, "userId", "createdAt"
+    SELECT 
+    posts.id, 
+    "hashtagId", 
+    message, 
+    link, 
+    "userId", 
+    "createdAt",
+    email,
+    picture,
+    users.name,
+    hashtags.name AS "hashtag"
     FROM postHashtag 
     JOIN posts ON postHashtag."postId" = posts.id
+    JOIN users ON posts."userId"= users.id 
+    JOIN hashtags ON "hashtagId"= hashtags.id 
     WHERE "hashtagId" = $1
-    ORDER BY postHashtag.id DESC;    
+    ORDER BY postHashtag.id DESC;
     `,[str]);
 
-    return list.rows;
+    return list;
 }
 
 async function addRelationPostHashtag(postId, hashtagId){
@@ -56,5 +68,6 @@ async function addRelationPostHashtag(postId, hashtagId){
         VALUES($1, $2);`, [postId, hashtagId]
     )
 }
+
 
 export {hashtagList, isThereHashtag, addHashtag, hashtagPosts, addRelationPostHashtag};

@@ -14,8 +14,7 @@ const postSigninSchema = joi.object({
 });
 
 const likeSchema = joi.object({
-  postId:joi.number().required(),
-  userId:joi.number().required()
+  postId:joi.number().required()
 })
 
 function signupSchema(req, res, next) {
