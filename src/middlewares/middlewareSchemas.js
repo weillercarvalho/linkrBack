@@ -12,6 +12,11 @@ const postSigninSchema = joi.object({
   password: joi.string().min(5).required(),
 });
 
+const likeSchema = joi.object({
+  postId:joi.number().required(),
+  userId:joi.number().required()
+})
+
 function signupSchema(req, res, next) {
   const { picture } = req.body;
 
@@ -37,6 +42,16 @@ function signinSchema(req, res, next) {
   }
 
   next();
-}
+};
 
-export { signupSchema, signinSchema };
+function likerSchema(req, res, next) {
+  const validation = likeSchema.validate(req.body, { abortEarly: false });
+  if (validation.error) {
+    const errors = validation.error.details.map((value) => value.message);
+    return res.status(422).send(errors);
+  }
+
+  next();
+};
+
+export { signupSchema, signinSchema, likerSchema };

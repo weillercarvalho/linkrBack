@@ -2,7 +2,6 @@
   "name": "projeto17-linkrback",
   "version": "1.0.0",
   "type": "module",
-  "description": "",
   "main": "./src/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -35,5 +34,9 @@
     "jsonwebtoken": "^8.5.1",
     "pg": "^8.8.0",
     "uuid": "^9.0.0"
+  },
+  "description": "",
+  "devDependencies": {
+    "nodemon": "^2.0.20"
   }
 }
