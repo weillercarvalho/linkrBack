@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { connection } from "../database/db.js";
 import * as signRepositories from "../repositories/signRepositories.js";
 import bcrypt from "bcrypt";
+import { STATUS_CODE } from "../enums/statusCodes.js";
 
 async function postSignup(req, res) {
   const { name, email, password, picture } = req.body;
@@ -11,7 +12,9 @@ async function postSignup(req, res) {
       await connection.query(`SELECT * FROM users WHERE email = $1;`, [email])
     ).rows;
     if (findEmail.length > 0) {
-      return res.status(409).send({ error: "Email already registered!" });
+      return res
+        .status(STATUS_CODE.CONFLICT)
+        .send({ error: "Email already registered!" });
     }
 
     const passwordEncrypted = bcrypt.hashSync(password, 10);
@@ -23,7 +26,7 @@ async function postSignup(req, res) {
       passwordEncrypted,
     });
 
-    res.status(201).send("User registered");
+    res.status(STATUS_CODE.CREATED).send("User registered");
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
@@ -39,12 +42,16 @@ async function postSignin(req, res) {
     ).rows;
 
     if (findUser.length === 0) {
-      return res.status(401).send({ error: "Invalid email or password" });
+      return res
+        .status(STATUS_CODE.UNAUTHORIZED)
+        .send({ error: "Invalid email or password" });
     }
 
     const isValid = bcrypt.compareSync(password, findUser[0].password);
     if (!isValid) {
-      return res.status(401).send({ error: "Invalid email or password" });
+      return res
+        .status(STATUS_CODE.UNAUTHORIZED)
+        .send({ error: "Invalid email or password" });
     }
 
     const existingSession = await connection.query(
@@ -68,7 +75,7 @@ async function postSignin(req, res) {
       token,
     });
 
-    res.status(200).send({ token });
+    res.status(STATUS_CODE.OK).send({ token });
   } catch (error) {
     console.log(error);
     res.sendStatus(500);

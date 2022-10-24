@@ -1,3 +1,4 @@
+import { STATUS_CODE } from "../enums/statusCodes.js";
 import joi from "joi";
 
 const postSignupSchema = joi.object({
@@ -22,12 +23,14 @@ function signupSchema(req, res, next) {
   const validation = postSignupSchema.validate(req.body, { abortEarly: false });
   if (validation.error) {
     const error = validation.error.details.map((value) => value.message);
-    return res.status(422).send({ error: error });
+    return res.status(STATUS_CODE.UNPROCESSABLE).send({ error: error });
   }
 
   const regexUrl = /^(ftp|http|https):\/\/[^ "]+$/.test(picture);
   if (!regexUrl) {
-    return res.status(422).send({ error: "available picture" });
+    return res
+      .status(STATUS_CODE.UNPROCESSABLE)
+      .send({ error: "available picture" });
   }
 
   next();
@@ -37,7 +40,7 @@ function signinSchema(req, res, next) {
   const validation = postSigninSchema.validate(req.body, { abortEarly: false });
   if (validation.error) {
     const error = validation.error.details.map((value) => value.message);
-    return res.status(422).send({ error: error });
+    return res.status(STATUS_CODE.UNPROCESSABLE).send({ error: error });
   }
 
   next();
