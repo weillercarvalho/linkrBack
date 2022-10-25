@@ -11,9 +11,9 @@ async function insertPost(message, link, useridinsert) {
     FROM posts 
     WHERE "userId" = $1 AND link = $2 AND message = $3
     ORDER BY id DESC
-    LIMIT 1;`,[useridinsert, link, message]
+    LIMIT 1;`,
+    [useridinsert, link, message]
   );
-  console.log(idPost.rows[0].id)
   return idPost.rows[0].id;
 }
 
@@ -24,8 +24,7 @@ async function getPost() {
         p.id as "postId", 
         p.message , 
         p.link , 
-        p."userId" , 
-        p."createdAt" , 
+        p."userId" ,  
         u."name" , 
         u.email , 
         u.picture 
