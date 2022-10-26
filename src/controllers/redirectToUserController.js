@@ -31,6 +31,8 @@ export async function LoadUserPosts(req, res) {
         userPosts[i].SharerId = originalPost.sharerId;
         userPosts[i].OriginalUserId = originalPost.userId;
       }
+
+      userPosts[i].reshareCount = 0;
     }
 
     let userLikes = await redirectToUserRepository.getLikesByUserId(userId);

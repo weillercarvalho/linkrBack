@@ -88,6 +88,8 @@ async function getTimeline(req, res) {
           userPosts[i].SharerId = originalPost.sharerId;
           userPosts[i].OriginalUserId = originalPost.userId;
         }
+
+        userPosts[i].reshareCount = 0;
       }
 
       return res.send(userPosts);

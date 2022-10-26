@@ -80,6 +80,25 @@ function createRelation(userId, oldId, newId) {
   );
 }
 
+function findOriginalPost(postId) {
+  return connection.query(
+    `select * from posts
+    where id=$1;`,
+    [postId]
+  );
+}
+
+function findLatestPost(userId, postId) {
+  return connection.query(
+    `
+  select * from share
+  where "userId"=$1 and "sharedPostId"=$2
+  ;
+  `,
+    [userId, postId]
+  );
+}
+
 const sharedRepository = {
   createShareRelation,
   getOldPost,
@@ -90,6 +109,8 @@ const sharedRepository = {
   insertSharedPost,
   fetchLatestInserted,
   createRelation,
+  findOriginalPost,
+  findLatestPost,
 };
 
 export default sharedRepository;
