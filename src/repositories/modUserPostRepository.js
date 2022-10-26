@@ -26,11 +26,16 @@ function updatePostByPostId(newMessage, postId) {
 }
 
 //Deletes post where postId equals the postId that's being searched
-function deletePostByPostId(postId) {
+async function deletePostByPostId(postId) {
+  await connection.query(
+    `
+    delete from likes l where l."postId"  = $1;
+      `,
+    [postId]
+  );
   return connection.query(
     `
-      delete from posts 
-      where id = $1;	
+    delete from posts p where p.id = $1;
       `,
     [postId]
   );

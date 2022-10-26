@@ -1,12 +1,12 @@
-import { STATUS_CODE } from "../enums/statusCodes.js";
-import redirectToUserRepository from "../repositories/redirectToUserRepository.js";
+import { STATUS_CODE } from '../enums/statusCodes.js';
+import redirectToUserRepository from '../repositories/redirectToUserRepository.js';
 
 export async function LoadUserPosts(req, res) {
   const { id } = req.params;
   const userId = id;
   if (!userId || !Number(userId)) {
     return res
-      .send({ error: "not a valid user" })
+      .send({ error: 'not a valid user' })
       .status(STATUS_CODE.BAD_REQUEST);
   }
   try {
@@ -26,7 +26,6 @@ export async function LoadUserPosts(req, res) {
 
 export async function findUsersByName(req, res) {
   const { name } = req.query;
-  console.log(name);
   try {
     let users = await redirectToUserRepository.getUserIdByName(name);
     users = users.rows;
