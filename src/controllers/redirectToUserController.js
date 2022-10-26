@@ -15,6 +15,24 @@ export async function LoadUserPosts(req, res) {
     if (!userPosts) {
       return res.sendStatus(STATUS_CODE.NOT_FOUND);
     }
+
+    for (let i = 0, totalPosts = userPosts.length; i < totalPosts; i++) {
+      if (userPosts[i].shared) {
+        const originalPost = (
+          await redirectToUserRepository.getOriginalPostBySharedPostId(
+            userPosts[i].PostId
+          )
+        ).rows[0];
+        userPosts[i].PostId = originalPost.postId;
+        userPosts[i].Message = originalPost.message;
+        userPosts[i].Avatar = originalPost.avatar;
+        userPosts[i].Username = originalPost.username;
+        userPosts[i].SharerName = originalPost.sharerName;
+        userPosts[i].SharerId = originalPost.sharerId;
+        userPosts[i].OriginalUserId = originalPost.userId;
+      }
+    }
+
     let userLikes = await redirectToUserRepository.getLikesByUserId(userId);
     userLikes = userLikes.rows;
     return res.status(STATUS_CODE.OK).send({ userPosts, userLikes });
