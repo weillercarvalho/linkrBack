@@ -3,7 +3,7 @@ import sharedRepository from '../repositories/shareRepository.js';
 
 export async function sharePost(req, res) {
   const { postId, removeShare } = req.body;
-  console.log('sharing');
+  const { user } = res.locals;
   try {
     let shareRelation;
     if (removeShare) {
@@ -16,9 +16,17 @@ export async function sharePost(req, res) {
       }
 
       return res.sendStatus(STATUS_CODE.OK);
-    }
+    } else {
+      const post = (await sharedRepository.findPostAndCopyContent(postId))
+        .rows[0];
+      post.shared = true;
+      await sharedRepository.insertSharedPost(post, user);
+      const latestPost = (await sharedRepository.fetchLatestInserted(post))
+        .rows[0];
 
-    console.log(shareRelation);
+      const latestPostId = latestPost.id;
+      await sharedRepository.createRelation(user.id, postId, latestPostId);
+    }
 
     return res.status(STATUS_CODE.OK);
   } catch (error) {

@@ -15,6 +15,7 @@ import {
   addRelationPostHashtag,
   addHashtag,
 } from '../repositories/hashtagRepositories.js';
+import redirectToUserRepository from '../repositories/redirectToUserRepository.js';
 
 async function postTimeline(req, res) {
   const { authorization } = req.headers;
@@ -52,13 +53,10 @@ async function postTimeline(req, res) {
         }
       }
     }
-<<<<<<< HEAD
-
-    return res.send(201);
-=======
-    const query = await connection.query (`SELECT * FROM posts JOIN users ON posts."userId" = users.id ORDER BY posts.id DESC;`);
+    const query = await connection.query(
+      `SELECT * FROM posts JOIN users ON posts."userId" = users.id ORDER BY posts.id DESC;`
+    );
     return res.status(201).send(query.rows);
->>>>>>> main
   } catch (error) {
     console.log(error);
     return res.status(500).send({
@@ -74,7 +72,25 @@ async function getTimeline(req, res) {
   try {
     const query = await getPost();
     if (!token) {
-      return res.send(query.rows);
+      let userPosts = query.rows;
+      for (let i = 0, totalPosts = userPosts.length; i < totalPosts; i++) {
+        if (userPosts[i].shared) {
+          const originalPost = (
+            await redirectToUserRepository.getOriginalPostBySharedPostId(
+              userPosts[i].postId
+            )
+          ).rows[0];
+          //userPosts[i].PostId = originalPost.postId;
+          userPosts[i].message = originalPost.message;
+          userPosts[i].picture = originalPost.avatar;
+          userPosts[i].name = originalPost.username;
+          userPosts[i].SharerName = originalPost.sharerName;
+          userPosts[i].SharerId = originalPost.sharerId;
+          userPosts[i].OriginalUserId = originalPost.userId;
+        }
+      }
+
+      return res.send(userPosts);
     }
     const user = await findUser(token);
     const userLikeList = await findUserLikes(user);
@@ -107,12 +123,7 @@ async function getTimeline(req, res) {
           totalLikes: totalLikesList[element.postId],
         };
     }
-<<<<<<< HEAD
-    res.send(list);
-=======
-    return res.send(list)
-    
->>>>>>> main
+    return res.send(list);
   } catch (error) {
     console.log(error);
     return res.status(500).send({
@@ -121,7 +132,6 @@ async function getTimeline(req, res) {
     });
   }
 }
-
 
 async function getPicture(req, res) {
   try {
@@ -134,4 +144,4 @@ async function getPicture(req, res) {
     });
   }
 }
-export { postTimeline, getTimeline, getPicture};
+export { postTimeline, getTimeline, getPicture };

@@ -48,12 +48,48 @@ function deleteSharedPost(postId) {
   return;
 }
 
+function findPostAndCopyContent(postId) {
+  return connection.query(`select * from posts p where p.id = $1;`, [postId]);
+}
+
+function insertSharedPost(post, user) {
+  return connection.query(
+    `insert into posts(message, link, "userId", shared)
+    values ($1, $2, $3, $4);`,
+    [post.message, post.link, user.id, post.shared]
+  );
+}
+
+function fetchLatestInserted(post) {
+  return connection.query(
+    `select * from posts
+    where "message"=$1 and "link"=$2 and shared=true
+    order by id DESC
+    limit 1;`,
+    [post.message, post.link]
+  );
+}
+
+function createRelation(userId, oldId, newId) {
+  return connection.query(
+    `
+  insert into share("userId", "originalPostId", "sharedPostId")
+  values ($1, $2, $3);
+  `,
+    [userId, oldId, newId]
+  );
+}
+
 const sharedRepository = {
   createShareRelation,
   getOldPost,
   createSharedPost,
   findSharedPost,
   deleteSharedPost,
+  findPostAndCopyContent,
+  insertSharedPost,
+  fetchLatestInserted,
+  createRelation,
 };
 
 export default sharedRepository;
