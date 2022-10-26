@@ -1,4 +1,4 @@
-import { hashtagList, hashtagPosts } from "../repositories/hashtagRepositories.js";
+import { hashtagList, hashtagPosts, allPostHashRelantion } from "../repositories/hashtagRepositories.js";
 import {findUser, findUserLikes, totalLikes} from '../repositories/likeRepositories.js'
 
 
@@ -53,7 +53,28 @@ async function getHashtagPosts(req, res) {
             "totalLikes": totalLikesList[element.id]        
         }
       }
-      console.log(list)
+      const relationPostHash = {};
+      const k = await allPostHashRelantion();
+      for (let i = 0; i < k.length; i++) {
+        const element = k[i];
+        relationPostHash[element.postId] = element.hashtags;
+      }
+
+      for (let i = 0; i < list.length; i++) {
+        const element = list[i];
+        if(relationPostHash[element.id]){
+          list[i] = {
+            ...element,
+            hashs: relationPostHash[element.id]
+          } 
+        }else 
+        list[i] = {
+          ...element,
+          hashs: []
+        } 
+        
+      }
+
       res.status(200).send(list)
       
     } catch (error) {
