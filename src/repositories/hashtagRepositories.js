@@ -70,10 +70,12 @@ async function addRelationPostHashtag(postId, hashtagId) {
   );
 }
 
-export {
-  hashtagList,
-  isThereHashtag,
-  addHashtag,
-  hashtagPosts,
-  addRelationPostHashtag,
-};
+async function allPostHashRelantion(){
+    const list  = await connection.query(
+        `Select "postId", ARRAY_AGG("hashtagId") AS "hashtags" FROM posthashtag GROUP BY "postId";`);
+    
+    return list.rows
+}
+
+
+export {hashtagList,allPostHashRelantion, isThereHashtag, addHashtag, hashtagPosts, addRelationPostHashtag};
