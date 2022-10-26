@@ -23,7 +23,7 @@ export async function LoadUserPosts(req, res) {
             userPosts[i].PostId
           )
         ).rows[0];
-        userPosts[i].PostId = originalPost.postId;
+        //userPosts[i].PostId = originalPost.postId;
         userPosts[i].Message = originalPost.message;
         userPosts[i].Avatar = originalPost.avatar;
         userPosts[i].Username = originalPost.username;

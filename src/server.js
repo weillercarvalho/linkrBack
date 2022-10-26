@@ -8,6 +8,7 @@ import hashtagRouter from './routes/hashtagRoute.js';
 import timelinerouter from './routes/timelineRoute.js';
 import redirectToUserRouter from './routes/redirectToUserRouter.js';
 import modUserPostRouter from './routes/modUserPostRouter.js';
+import shareRouter from './routes/shareRouter.js';
 dotenv.config();
 
 const server = express();
@@ -21,6 +22,7 @@ server.use(hashtagRouter);
 server.use(timelinerouter);
 server.use(redirectToUserRouter);
 server.use(modUserPostRouter);
+server.use(shareRouter);
 
 server.get('/status', (req, res) => {
   res.send('ok');
