@@ -1,64 +1,64 @@
-import { isLiked, likerPost, dislikePost, findUser } from "../repositories/likeRepositories.js";
+import {
+  isLiked,
+  likerPost,
+  dislikePost,
+  findUser,
+} from "../repositories/likeRepositories.js";
 
-async function insertLike(req, res){
-    const { authorization } = req.headers;
-    const token = authorization?.replace(`Bearer `, ``);
-    const {postId} = req.body;
+async function insertLike(req, res) {
+  const { authorization } = req.headers;
+  const token = authorization?.replace(`Bearer `, ``);
+  const { postId } = req.body;
 
-    if(!token){
-        return res.sendStatus(401);
+  if (!token) {
+    return res.sendStatus(401);
+  }
+
+  try {
+    const userId = await findUser(token);
+    if (!userId) {
+      return res.sendStatus(401);
+    }
+    const liked = await isLiked(userId, postId);
+    if (liked) {
+      return res.status(409).send("Post already liked!");
     }
 
+    await likerPost(userId, postId);
 
-    try{
-        const userId = await findUser(token);
-        if(!userId){
-            return res.sendStatus(401);
-        } 
-        const liked = await isLiked(userId, postId);
-        if(liked){
-            return res.status(409).send("Post already liked!");
-        };
+    return res.status(201).send("Like registered!");
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+}
 
-        await likerPost(userId, postId);
+async function dislike(req, res) {
+  const { authorization } = req.headers;
+  const token = authorization?.replace(`Bearer `, ``);
+  const { postId } = req.body;
 
-        return res.status(201).send("Like registered!");
+  if (!token) {
+    return res.sendStatus(401);
+  }
 
-    }catch(err){
-        console.log(err);
-        res.sendStatus(500);
-    };
-};
-
-async function dislike(req, res){
-    const { authorization } = req.headers;
-    const token = authorization?.replace(`Bearer `, ``);
-    const {postId} = req.body;
-
-    if(!token){
-        return res.sendStatus(401);
+  try {
+    const userId = await findUser(token);
+    if (!userId) {
+      return res.sendStatus(401);
+    }
+    const liked = await isLiked(userId, postId);
+    if (!liked) {
+      return res.status(404).send("Post not liked!");
     }
 
-    try{
-        const userId = await findUser(token);
-        if(!userId){
-            return res.sendStatus(401);
-        } 
-        const liked = await isLiked(userId, postId);
-        if(!liked){
-            return res.status(404).send("Post not liked!");
-        };
+    await dislikePost(userId, postId);
 
-        await dislikePost(userId, postId);
+    return res.status(200).send("not like :(");
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+}
 
-        return res.status(200).send("not like :(");
-
-    }catch(err){
-        console.log(err);
-        res.sendStatus(500);
-    };
-};
-
-
-
-export {insertLike, dislike};
+export { insertLike, dislike };

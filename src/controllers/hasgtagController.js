@@ -1,12 +1,12 @@
 import {
   hashtagList,
   hashtagPosts,
-} from '../repositories/hashtagRepositories.js';
+} from "../repositories/hashtagRepositories.js";
 import {
   findUser,
   findUserLikes,
   totalLikes,
-} from '../repositories/likeRepositories.js';
+} from "../repositories/likeRepositories.js";
 
 async function getHashtag(req, res) {
   try {
@@ -64,7 +64,7 @@ async function getHashtagPosts(req, res) {
     console.log(error);
     return res.status(500).send({
       message:
-        'An error occured while trying to fetch the posts, please refresh the page',
+        "An error occured while trying to fetch the posts, please refresh the page",
     });
   }
 }
