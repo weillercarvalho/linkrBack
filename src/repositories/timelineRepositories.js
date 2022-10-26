@@ -30,8 +30,7 @@ async function getPost() {
         u.picture 
     FROM posts p 
     JOIN users u ON p."userId" = u.id 
-    ORDER BY p.id DESC 
-    LIMIT 20;`);
+    ORDER BY p.id DESC;`);
   return query;
 }
 
@@ -42,4 +41,4 @@ async function getPictures() {
   return query;
 }
 
-export { insertPost, getPost, getPictures };
+export { insertPost, getPost, getPictures};
