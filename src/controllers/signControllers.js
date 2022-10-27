@@ -6,6 +6,7 @@ import { STATUS_CODE } from "../enums/statusCodes.js";
 
 async function postSignup(req, res) {
   const { name, email, password, picture } = req.body;
+  console.log("entrei")
 
   try {
     const findEmail = (
