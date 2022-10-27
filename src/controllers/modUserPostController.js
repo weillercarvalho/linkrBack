@@ -46,9 +46,6 @@ export async function deletePost(req, res) {
 
     const sharedList = (await modUserPostRepository.isPostShared(postId)).rows;
 
-    console.log(postId);
-    console.log(sharedList);
-
     if (!sharedList[0]) {
       console.log('Deleting post without shares');
       await modUserPostRepository.deleteLikeRelation(postId);
@@ -59,17 +56,11 @@ export async function deletePost(req, res) {
     for (let i = 0, len = sharedList.length; i < len; i++) {
       const postToBeDeleted = sharedList[i].sharedPostId;
 
-      console.log('Deleting: ');
-      console.log(postToBeDeleted);
-      console.log('operation 1/3');
-
       //Deletes like relation
       await modUserPostRepository.deleteLikeRelation(postToBeDeleted);
-      console.log('operation 2/3');
 
       //Deletes share relation
       await modUserPostRepository.deleteShareRelation(postToBeDeleted);
-      console.log('operation 3/3');
       modUserPostRepository.deletePostBySharedPostId(postToBeDeleted);
 
       //Deletes shared post
