@@ -23,6 +23,7 @@ export async function validateToken(req, res, next) {
       return res.status(STATUS_CODE.UNAUTHORIZED).send('No user');
     }
     res.locals.user = user;
+    res.locals.token = token;
     next();
   } catch (error) {
     console.log(error);

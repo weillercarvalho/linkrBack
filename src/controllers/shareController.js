@@ -42,9 +42,8 @@ export async function sharePost(req, res) {
 
 async function findOriginalPost(postId, userId, i = 0) {
   const post = (await sharedRepository.findOriginalPost(postId)).rows[0];
-  console.log('recursion: ', i);
   if (i === 500) {
-    console.log('Recursion break');
+    console.log('Recursion break, post not found withing 500 shares');
     return null;
   }
 
@@ -53,7 +52,6 @@ async function findOriginalPost(postId, userId, i = 0) {
       await sharedRepository.findLatestPost(post.userId, postId)
     ).rows[0];
 
-    console.log(latestPost);
     return findOriginalPost(
       latestPost.originalPostId,
       latestPost.userId,
