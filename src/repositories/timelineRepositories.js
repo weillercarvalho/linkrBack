@@ -27,7 +27,8 @@ async function getPost() {
         p."userId" ,  
         u."name" , 
         u.email , 
-        u.picture 
+        u.picture,
+        p.shared 
     FROM posts p 
     JOIN users u ON p."userId" = u.id 
     ORDER BY p.id DESC;`);
@@ -41,4 +42,4 @@ async function getPictures() {
   return query;
 }
 
-export { insertPost, getPost, getPictures};
+export { insertPost, getPost, getPictures };

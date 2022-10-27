@@ -11,7 +11,8 @@ function getPostsByUserId(userId) {
       p.message as "Message", 
       p.link as "Link", 
       l1."userLikedId" as "IdLiked", 
-      u2."name" as "LikedName"
+      u2."name" as "LikedName",
+      p.shared
     from posts p
     full outer join users u1 on u1.id = p."userId" 
     full outer join likes l1 on p.id = l1."postId"
@@ -78,12 +79,28 @@ function getUserInfoByUserId(userId) {
   return connection.query(`select * from users u where u.id = $1`, [userId]);
 }
 
+function getOriginalPostBySharedPostId(postId) {
+  return connection.query(
+    `
+    select p.id as "postId", p.message as "message", p.link as "link", p."userId" as "userId" , u.name as "username" , u.picture as "avatar", u2.name as "sharerName", u2.id as "sharerId"
+    from share s 
+    join posts p on p.id = s."originalPostId" 
+    join users u on u.id = p."userId"
+    join users u2 on u2.id = s."userId"
+    where s."sharedPostId" = $1
+    ;
+    `,
+    [postId]
+  );
+}
+
 const redirectToUserRepository = {
   getPostsByUserId,
   getLikesByUserId,
   getUserIdByName,
   getUserIdByPostId,
   getUserInfoByUserId,
+  getOriginalPostBySharedPostId,
 };
 
 export default redirectToUserRepository;
