@@ -1,5 +1,5 @@
 import { hashtagList, hashtagPosts, allPostHashRelantion } from "../repositories/hashtagRepositories.js";
-import {findUser, findUserLikes, totalLikes} from '../repositories/likeRepositories.js'
+import {findUser, findUserLikes, totalLikes, findUserShareds, totalShareds} from '../repositories/likeRepositories.js'
 
 
 async function getHashtag(req, res){
@@ -28,7 +28,7 @@ async function getHashtagPosts(req, res) {
       const list = [];
       for (let index = 0; index < query.rows.length; index++) {
         const element = query.rows[index];
-        if(userLikeList[element.id] !== 1){
+        if(userLikeList[element.postId] !== 1){
           list.push({
             ...element,
             isLiked: false
@@ -41,7 +41,7 @@ async function getHashtagPosts(req, res) {
       const totalLikesList = await totalLikes();
       for (let index = 0; index < list.length; index++) {
         const element = list[index];
-        if(!totalLikesList[element.id]){
+        if(!totalLikesList[element.postId]){
           list[index] = {
             ...element,
             "totalLikes":0       
@@ -50,7 +50,7 @@ async function getHashtagPosts(req, res) {
         }else
         list[index] = {
             ...element,
-            "totalLikes": totalLikesList[element.id]        
+            "totalLikes": totalLikesList[element.postId]        
         }
       }
       const relationPostHash = {};
@@ -73,7 +73,38 @@ async function getHashtagPosts(req, res) {
           hashs: []
         } 
         
-      }
+      };
+
+      const shareds = await findUserShareds(user);
+      for (let index = 0; index < list.length; index++) {
+        const element = list[index];
+        if(shareds[element.postId] !== 1){
+          list[index]={
+            ...element,
+            shared: false
+          }
+        }else list[index]={
+          ...element,
+            shared: true
+        }
+      };
+
+      const totalSharedList = await totalShareds();
+      for (let index = 0; index < list.length; index++) {
+        const element = list[index];
+        if(!totalSharedList[element.postId]){
+          list[index] = {
+            ...element,
+            "reshareCount":0       
+        }
+        continue
+        }else
+        list[index] = {
+            ...element,
+            "reshareCount": totalSharedList[element.postId]        
+        }
+      };
+
 
       res.status(200).send(list)
       
