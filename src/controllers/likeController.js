@@ -3,6 +3,7 @@ import {
   likerPost,
   dislikePost,
   findUser,
+  getNamePostLikers,
 } from "../repositories/likeRepositories.js";
 
 async function insertLike(req, res) {
@@ -61,4 +62,28 @@ async function dislike(req, res) {
   }
 }
 
-export { insertLike, dislike };
+async function nameLikers(req, res) {
+  const { authorization } = req.headers;
+  const token = authorization?.replace(`Bearer `, ``);
+  const { postId } = req.params;
+
+  if (!token) {
+    return res.sendStatus(401);
+  }
+
+  try {
+    console.log(postId);
+    const userId = await findUser(token);
+    if (!userId) {
+      return res.sendStatus(401);
+    }
+    const nameList = await getNamePostLikers(postId);
+    console.log(req.headers);
+    res.status(200).send(nameList);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+}
+
+export { insertLike, dislike, nameLikers };

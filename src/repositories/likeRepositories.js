@@ -52,5 +52,18 @@ async function totalLikes(){
   return totalList
 }
 
+async function getNamePostLikers(idPost){
+  const list = await connection.query(
+    `SELECT 
+    "postId" AS id, 
+    users.name 
+    FROM likes 
+    JOIN users ON likes."userLikedId"=users.id 
+    WHERE "postId"= $1;
+    `,[idPost]
+  );
+  return list.rows;
+}
 
-export {likerPost, isLiked, dislikePost, findUser, findUserLikes, totalLikes};
+
+export {likerPost, isLiked, dislikePost,getNamePostLikers, findUser, findUserLikes, totalLikes};

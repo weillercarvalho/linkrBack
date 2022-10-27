@@ -43,8 +43,8 @@ async function postTimeline(req, res) {
         }
       }
     }
-    
-    return res.send(201);
+    const query = await connection.query (`SELECT * FROM posts JOIN users ON posts."userId" = users.id ORDER BY posts.id DESC;`);
+    return res.status(201).send(query.rows);
   } catch (error) {
     console.log(error)
     return res.status(500).send({
@@ -93,7 +93,7 @@ async function getTimeline(req, res) {
           totalLikes: totalLikesList[element.postId]        
       }
     }
-    res.send(list)
+    return res.send(list)
     
   } catch (error) {
     console.log(error)
@@ -103,6 +103,7 @@ async function getTimeline(req, res) {
     });
   }
 }
+
 
 async function getPicture(req, res) {
   try {
@@ -115,4 +116,4 @@ async function getPicture(req, res) {
     });
   }
 }
-export { postTimeline, getTimeline, getPicture };
+export { postTimeline, getTimeline, getPicture};
