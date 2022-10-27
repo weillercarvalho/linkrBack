@@ -110,26 +110,31 @@ async function getTimeline(req, res) {
       const element = query.rows[index];
       const originalPost = (
         await redirectToUserRepository.getOriginalPostBySharedPostId(
-          element[index].postId
+          element.postId
         )
       ).rows[0];
-      if (element[index].shared) {
-        //element[index].PostId = originalPost.postId;
-        element[index].message = originalPost.message;
-        element[index].picture = originalPost.avatar;
-        element[index].name = originalPost.username;
-        element[index].SharerName = originalPost.sharerName;
-        element[index].SharerId = originalPost.sharerId;
-        element[index].OriginalUserId = originalPost.userId;
+      if (element.shared) {
+        //element.PostId = originalPost.postId;
+        console.log(originalPost);
+
+        element.message = originalPost.message;
+        element.picture = originalPost.avatar;
+        element.name = originalPost.username;
+        element.SharerName = originalPost.sharerName;
+        element.SharerId = originalPost.sharerId;
+        element.OriginalUserId = originalPost.userId;
       }
 
-      const sharesCount = (
-        await sharedRepository.countShares(originalPost.postId)
-      ).rows[0].count;
-
-      element[i].reshareCount = sharesCount; //Math.round(Math.random() * 100);
-
-      console.log(element[i]);
+      if (originalPost) {
+        const sharesCount = (
+          await sharedRepository.countShares(originalPost.postId)
+        ).rows[0].count;
+        element.reshareCount = sharesCount; //Math.round(Math.random() * 100);
+      } else {
+        element.reshareCount = (
+          await sharedRepository.countShares(element.postId)
+        ).rows[0].count;
+      }
 
       if (userLikeList[element.postId] !== 1) {
         list.push({
@@ -145,6 +150,7 @@ async function getTimeline(req, res) {
     const totalLikesList = await totalLikes();
     for (let index = 0; index < list.length; index++) {
       const element = list[index];
+      console.log(element);
       if (!totalLikesList[element.postId]) {
         list[index] = {
           ...element,

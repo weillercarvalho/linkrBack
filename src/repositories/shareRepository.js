@@ -44,6 +44,7 @@ function findSharedPost(postId) {
 
 function deleteSharedPost(postId) {
   connection.query(`delete from share where "sharedPostId" = $1;`, [postId]);
+  connection.query(`delete from likes where "postId" = $1;`, [postId]);
   connection.query(`delete from posts where id = $1;`, [postId]);
   return;
 }
