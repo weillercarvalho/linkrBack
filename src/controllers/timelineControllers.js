@@ -16,6 +16,7 @@ import {
   addHashtag,
 } from '../repositories/hashtagRepositories.js';
 import redirectToUserRepository from '../repositories/redirectToUserRepository.js';
+import sharedRepository from '../repositories/shareRepository.js';
 
 async function postTimeline(req, res) {
   const { authorization } = req.headers;
@@ -74,13 +75,12 @@ async function getTimeline(req, res) {
     if (!token) {
       let userPosts = query.rows;
       for (let i = 0, totalPosts = userPosts.length; i < totalPosts; i++) {
-        if (userPosts[i].shared) {
-          const originalPost = (
-            await redirectToUserRepository.getOriginalPostBySharedPostId(
-              userPosts[i].postId
-            )
-          ).rows[0];
-          //userPosts[i].PostId = originalPost.postId;
+        const originalPost = (
+          await redirectToUserRepository.getOriginalPostBySharedPostId(
+            userPosts[i].postId
+          )
+        ).rows[0];
+        if (userPosts[i].shared && originalPost) {
           userPosts[i].message = originalPost.message;
           userPosts[i].picture = originalPost.avatar;
           userPosts[i].name = originalPost.username;
@@ -89,7 +89,16 @@ async function getTimeline(req, res) {
           userPosts[i].OriginalUserId = originalPost.userId;
         }
 
-        userPosts[i].reshareCount = 0;
+        if (originalPost) {
+          const sharesCount = (
+            await sharedRepository.countShares(originalPost.postId)
+          ).rows[0].count;
+          userPosts[i].reshareCount = sharesCount; //Math.round(Math.random() * 100);
+        } else {
+          userPosts[i].reshareCount = (
+            await sharedRepository.countShares(userPosts[i].postId)
+          ).rows[0].count;
+        }
       }
 
       return res.send(userPosts);
@@ -99,6 +108,29 @@ async function getTimeline(req, res) {
     const list = [];
     for (let index = 0; index < query.rows.length; index++) {
       const element = query.rows[index];
+      const originalPost = (
+        await redirectToUserRepository.getOriginalPostBySharedPostId(
+          element[index].postId
+        )
+      ).rows[0];
+      if (element[index].shared) {
+        //element[index].PostId = originalPost.postId;
+        element[index].message = originalPost.message;
+        element[index].picture = originalPost.avatar;
+        element[index].name = originalPost.username;
+        element[index].SharerName = originalPost.sharerName;
+        element[index].SharerId = originalPost.sharerId;
+        element[index].OriginalUserId = originalPost.userId;
+      }
+
+      const sharesCount = (
+        await sharedRepository.countShares(originalPost.postId)
+      ).rows[0].count;
+
+      element[i].reshareCount = sharesCount; //Math.round(Math.random() * 100);
+
+      console.log(element[i]);
+
       if (userLikeList[element.postId] !== 1) {
         list.push({
           ...element,

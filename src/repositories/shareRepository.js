@@ -99,6 +99,15 @@ function findLatestPost(userId, postId) {
   );
 }
 
+function countShares(postId) {
+  return connection.query(
+    `
+  select count("originalPostId") from share where "originalPostId" = $1;
+  `,
+    [postId]
+  );
+}
+
 const sharedRepository = {
   createShareRelation,
   getOldPost,
@@ -111,6 +120,7 @@ const sharedRepository = {
   createRelation,
   findOriginalPost,
   findLatestPost,
+  countShares,
 };
 
 export default sharedRepository;

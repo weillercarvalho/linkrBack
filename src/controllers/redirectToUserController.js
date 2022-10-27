@@ -1,5 +1,6 @@
 import { STATUS_CODE } from '../enums/statusCodes.js';
 import redirectToUserRepository from '../repositories/redirectToUserRepository.js';
+import sharedRepository from '../repositories/shareRepository.js';
 
 export async function LoadUserPosts(req, res) {
   const { id } = req.params;
@@ -17,12 +18,12 @@ export async function LoadUserPosts(req, res) {
     }
 
     for (let i = 0, totalPosts = userPosts.length; i < totalPosts; i++) {
+      const originalPost = (
+        await redirectToUserRepository.getOriginalPostBySharedPostId(
+          userPosts[i].PostId
+        )
+      ).rows[0];
       if (userPosts[i].shared) {
-        const originalPost = (
-          await redirectToUserRepository.getOriginalPostBySharedPostId(
-            userPosts[i].PostId
-          )
-        ).rows[0];
         //userPosts[i].PostId = originalPost.postId;
         userPosts[i].Message = originalPost.message;
         userPosts[i].Avatar = originalPost.avatar;
@@ -32,7 +33,16 @@ export async function LoadUserPosts(req, res) {
         userPosts[i].OriginalUserId = originalPost.userId;
       }
 
-      userPosts[i].reshareCount = 0;
+      if (originalPost) {
+        const sharesCount = (
+          await sharedRepository.countShares(originalPost.postId)
+        ).rows[0].count;
+        userPosts[i].reshareCount = sharesCount; //Math.round(Math.random() * 100);
+      } else {
+        userPosts[i].reshareCount = (
+          await sharedRepository.countShares(userPosts[i].PostId)
+        ).rows[0].count;
+      }
     }
 
     let userLikes = await redirectToUserRepository.getLikesByUserId(userId);

@@ -12,13 +12,11 @@ export async function sharePost(req, res) {
 
       if (postToRemove === postId) {
         //remove post and relation:
-        await sharedRepository.deleteSharedPost(postId);
+        sharedRepository.deleteSharedPost(postId);
       }
       return res.sendStatus(STATUS_CODE.OK);
     } else {
       const originalPostId = await findOriginalPost(postId, user.id);
-      console.log('initialPostId: ', postId);
-      console.log('originalPostId: ', originalPostId);
       const post = (
         await sharedRepository.findPostAndCopyContent(originalPostId)
       ).rows[0];
@@ -45,8 +43,7 @@ export async function sharePost(req, res) {
 async function findOriginalPost(postId, userId, i = 0) {
   const post = (await sharedRepository.findOriginalPost(postId)).rows[0];
   console.log('recursion: ', i);
-  //console.log('post: ', post);
-  if (i === 5) {
+  if (i === 500) {
     console.log('Recursion break');
     return null;
   }
