@@ -24,7 +24,6 @@ export async function LoadUserPosts(req, res) {
     const { token } = res.locals;
     const userLikesId = await findUser(token);
     const userLikeList = await findUserLikes(userLikesId);
-    console.log(userLikeList);
     const list = [];
 
     for (let i = 0, totalPosts = userPosts.length; i < totalPosts; i++) {
@@ -110,9 +109,6 @@ export async function LoadUserPosts(req, res) {
           };
       }
     }
-
-    //console.log(list[0]);
-    //console.log(userPosts[0]);
 
     return res.status(STATUS_CODE.OK).send(list);
   } catch (error) {
