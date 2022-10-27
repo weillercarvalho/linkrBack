@@ -25,7 +25,6 @@ async function postTimeline(req, res) {
   if (!token) {
     return res.sendStatus(409);
   }
-  console.log(hashtags)
   try {
     const gettingUserId = await connection.query(
       `SELECT * FROM sessions WHERE token = $1 ORDER BY id DESC LIMIT 1`,
@@ -58,7 +57,7 @@ async function postTimeline(req, res) {
     const query = await connection.query(
       `SELECT * FROM posts JOIN users ON posts."userId" = users.id ORDER BY posts.id DESC;`
     );
-    return res.status(201).send(hashtags);//query.rows
+    return res.status(201).send(query.rows);
   } catch (error) {
     console.log(error);
     return res.status(500).send({
