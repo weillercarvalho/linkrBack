@@ -94,7 +94,7 @@ async function getTimeline(req, res) {
           const sharesCount = (
             await sharedRepository.countShares(originalPost.postId)
           ).rows[0].count;
-          userPosts[i].reshareCount = sharesCount; //Math.round(Math.random() * 100);
+          userPosts[i].reshareCount = sharesCount;
         } else {
           userPosts[i].reshareCount = (
             await sharedRepository.countShares(userPosts[i].postId)
@@ -115,9 +115,6 @@ async function getTimeline(req, res) {
         )
       ).rows[0];
       if (element.shared) {
-        //element.PostId = originalPost.postId;
-        console.log(originalPost);
-
         element.message = originalPost.message;
         element.picture = originalPost.avatar;
         element.name = originalPost.username;
@@ -125,44 +122,73 @@ async function getTimeline(req, res) {
         element.SharerId = originalPost.sharerId;
         element.OriginalUserId = originalPost.userId;
       }
-
       if (originalPost) {
         const sharesCount = (
           await sharedRepository.countShares(originalPost.postId)
         ).rows[0].count;
-        element.reshareCount = sharesCount; //Math.round(Math.random() * 100);
+        element.reshareCount = sharesCount;
+
+        if (userLikeList[originalPost.postId] !== 1) {
+          list.push({
+            ...element,
+            isLiked: false,
+          });
+        } else
+          list.push({
+            ...element,
+            isLiked: true,
+          });
       } else {
         element.reshareCount = (
           await sharedRepository.countShares(element.postId)
         ).rows[0].count;
-      }
 
-      if (userLikeList[element.postId] !== 1) {
-        list.push({
-          ...element,
-          isLiked: false,
-        });
-      } else
-        list.push({
-          ...element,
-          isLiked: true,
-        });
+        if (userLikeList[element.postId] !== 1) {
+          list.push({
+            ...element,
+            isLiked: false,
+          });
+        } else
+          list.push({
+            ...element,
+            isLiked: true,
+          });
+      }
     }
     const totalLikesList = await totalLikes();
     for (let index = 0; index < list.length; index++) {
       const element = list[index];
-      console.log(element);
-      if (!totalLikesList[element.postId]) {
-        list[index] = {
-          ...element,
-          totalLikes: 0,
-        };
-        continue;
-      } else
-        list[index] = {
-          ...element,
-          totalLikes: totalLikesList[element.postId],
-        };
+      if (!element.shared) {
+        if (!totalLikesList[element.postId]) {
+          list[index] = {
+            ...element,
+            totalLikes: 0,
+          };
+          continue;
+        } else
+          list[index] = {
+            ...element,
+            totalLikes: totalLikesList[element.postId],
+          };
+      }
+      if (element.shared) {
+        const originalPost = (
+          await redirectToUserRepository.getOriginalPostBySharedPostId(
+            element.postId
+          )
+        ).rows[0];
+        if (!totalLikesList[originalPost.postId]) {
+          list[index] = {
+            ...element,
+            totalLikes: 0,
+          };
+          continue;
+        } else
+          list[index] = {
+            ...element,
+            totalLikes: totalLikesList[originalPost.postId],
+          };
+      }
     }
     return res.send(list);
   } catch (error) {
