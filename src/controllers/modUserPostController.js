@@ -40,6 +40,37 @@ export async function deletePost(req, res) {
     if (post.userId !== user.id) {
       return res.sendStatus(STATUS_CODE.UNAUTHORIZED);
     }
+
+    //Verify if post to be deleted is on the share table
+    //if it is, returns list of share posts
+
+    const sharedList = (await modUserPostRepository.isPostShared(postId)).rows;
+
+    if (!sharedList[0]) {
+      await modUserPostRepository.deleteLikeRelation(postId);
+      await modUserPostRepository.deletePostByPostId(postId);
+      return res.sendStatus(STATUS_CODE.OK);
+    }
+
+    for (let i = 0, len = sharedList.length; i < len; i++) {
+      const postToBeDeleted = sharedList[i].sharedPostId;
+
+      //Deletes like relation
+      await modUserPostRepository.deleteLikeRelation(postToBeDeleted);
+
+      //Deletes share relation
+      await modUserPostRepository.deleteShareRelation(postToBeDeleted);
+      modUserPostRepository.deletePostBySharedPostId(postToBeDeleted);
+
+      //Deletes shared post
+      await modUserPostRepository.deletePostByPostId(postToBeDeleted);
+    }
+
+    //Deletes share relation
+    await modUserPostRepository.deleteShareRelation(postId);
+    await modUserPostRepository.deleteLikeRelation(postId);
+
+    //Deletes post
     await modUserPostRepository.deletePostByPostId(postId);
     return res.sendStatus(STATUS_CODE.OK);
   } catch (error) {
