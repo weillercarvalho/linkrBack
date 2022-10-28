@@ -48,6 +48,7 @@ export async function deletePost(req, res) {
 
     if (!sharedList[0]) {
       await modUserPostRepository.deleteLikeRelation(postId);
+      await modUserPostRepository.deleteCommentsBySharedPostId(postId);
       await modUserPostRepository.deletePostByPostId(postId);
       return res.sendStatus(STATUS_CODE.OK);
     }
@@ -57,6 +58,9 @@ export async function deletePost(req, res) {
 
       //Deletes like relation
       await modUserPostRepository.deleteLikeRelation(postToBeDeleted);
+
+      //Deletes comments
+      await modUserPostRepository.deleteCommentsBySharedPostId(postToBeDeleted);
 
       //Deletes share relation
       await modUserPostRepository.deleteShareRelation(postToBeDeleted);
