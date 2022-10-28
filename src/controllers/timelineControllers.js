@@ -58,7 +58,7 @@ async function postTimeline(req, res) {
     const query = await connection.query(
       `SELECT * FROM posts JOIN users ON posts."userId" = users.id ORDER BY posts.id DESC;`
     );
-    return res.status(201).send(hashtags);//query.rows
+    return res.status(201).send(query.rows);
   } catch (error) {
     console.log(error);
     return res.status(500).send({
