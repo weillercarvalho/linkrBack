@@ -5,8 +5,8 @@ async function hashtagList() {
     MAX("hashtagId") AS "id", 
     name, 
     COUNT(*) AS "postCount" 
-    FROM posthashtag 
-    LEFT JOIN hashtags ON posthashtag."hashtagId" = hashtags.id 
+    FROM posthashtags 
+    LEFT JOIN hashtags ON posthashtags."hashtagId" = hashtags.id 
     GROUP BY name 
     ORDER BY "postCount" DESC 
     LIMIT 10;
@@ -39,22 +39,21 @@ async function hashtagPosts(str) {
   const list = await connection.query(
     `
     SELECT 
-    posts.id, 
+    posts.id AS "postId", 
     "hashtagId", 
     message, 
     link, 
     "userId", 
-    "createdAt",
     email,
     picture,
     users.name,
     hashtags.name AS "hashtag"
-    FROM postHashtag 
-    JOIN posts ON postHashtag."postId" = posts.id
+    FROM posthashtags
+    JOIN posts ON postHashtags."postId" = posts.id
     JOIN users ON posts."userId"= users.id 
     JOIN hashtags ON "hashtagId"= hashtags.id 
     WHERE "hashtagId" = $1
-    ORDER BY postHashtag.id DESC;
+    ORDER BY postHashtags.id DESC;
     `,
     [str]
   );
@@ -64,7 +63,7 @@ async function hashtagPosts(str) {
 
 async function addRelationPostHashtag(postId, hashtagId) {
   await connection.query(
-    `INSERT INTO postHashtag ("postId", "hashtagId")
+    `INSERT INTO posthashtags("postId", "hashtagId")
         VALUES($1, $2);`,
     [postId, hashtagId]
   );
@@ -72,7 +71,7 @@ async function addRelationPostHashtag(postId, hashtagId) {
 
 async function allPostHashRelantion(){
     const list  = await connection.query(
-        `Select "postId", ARRAY_AGG("hashtagId") AS "hashtags" FROM posthashtag GROUP BY "postId";`);
+        `Select "postId", ARRAY_AGG("hashtagId") AS "hashtags" FROM posthashtags GROUP BY "postId";`);
     
     return list.rows
 }

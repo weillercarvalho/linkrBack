@@ -37,7 +37,17 @@ async function findUserLikes(userId){
     posts[element.postId] = 1;  
   }
   return posts;
-}
+};
+
+async function findUserShareds(userId){
+  const id = await connection.query(`SELECT * FROM share WHERE "userId" = 2;`);
+  const posts ={};
+  for (let index = 0; index < id.rows.length; index++) {
+    const element = id.rows[index];
+    posts[element.sharedPostId] = 1;  
+  }
+  return posts;
+};
 
 async function totalLikes(){
   const list  = await connection.query(
@@ -50,7 +60,20 @@ async function totalLikes(){
     totalList[element.postId] = element.count;
   }
   return totalList
-}
+};
+
+async function totalShareds(){
+  const list  = await connection.query(
+    `SELECT "originalPostId", COUNT(*) 
+    FROM share GROUP BY "originalPostId";`
+  )
+  const totalList={};
+  for (let index = 0; index < list.rows.length; index++) {
+    const element = list.rows[index];
+    totalList[element.originalPostId] = element.count;
+  }
+  return totalList
+};
 
 async function getNamePostLikers(idPost){
   const list = await connection.query(
@@ -66,4 +89,4 @@ async function getNamePostLikers(idPost){
 }
 
 
-export {likerPost, isLiked, dislikePost,getNamePostLikers, findUser, findUserLikes, totalLikes};
+export {likerPost, totalShareds, findUserShareds, isLiked, dislikePost,getNamePostLikers, findUser, findUserLikes, totalLikes};

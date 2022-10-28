@@ -5,8 +5,18 @@ import {
   getPictures,
 } from '../repositories/timelineRepositories.js';
 import { isValidUrl } from '../schemas/urlSchema.js';
-import {findUser, findUserLikes, totalLikes} from '../repositories/likeRepositories.js'
-import {isThereHashtag, addRelationPostHashtag, addHashtag} from '../repositories/hashtagRepositories.js'
+import {
+  findUser,
+  findUserLikes,
+  totalLikes,
+} from '../repositories/likeRepositories.js';
+import {
+  isThereHashtag,
+  addRelationPostHashtag,
+  addHashtag,
+} from '../repositories/hashtagRepositories.js';
+import redirectToUserRepository from '../repositories/redirectToUserRepository.js';
+import sharedRepository from '../repositories/shareRepository.js';
 
 async function postTimeline(req, res) {
   const { authorization } = req.headers;
@@ -15,10 +25,10 @@ async function postTimeline(req, res) {
   if (!token) {
     return res.sendStatus(409);
   }
-
   try {
     const gettingUserId = await connection.query(
-      `SELECT * FROM sessions WHERE token = $1 ORDER BY id DESC LIMIT 1`, [token]
+      `SELECT * FROM sessions WHERE token = $1 ORDER BY id DESC LIMIT 1`,
+      [token]
     );
 
     const gettinToken = gettingUserId.rows[0].token;
@@ -31,22 +41,25 @@ async function postTimeline(req, res) {
     }
     const useridinsert = gettingUserId.rows[0].userId;
     const postId = await insertPost(message, link, useridinsert);
-    if (hashtags){
+    if (hashtags) {
       for (let index = 0; index < hashtags.length; index++) {
         const element = hashtags[index];
         const hashtagId = await isThereHashtag(element);
-        if(hashtagId){
+        console.log(hashtagId);
+        if (hashtagId) {
           await addRelationPostHashtag(postId, hashtagId);
-        }else {
+        } else {
           const hashId = await addHashtag(element);
           await addRelationPostHashtag(postId, hashId);
         }
       }
     }
-    const query = await connection.query (`SELECT * FROM posts JOIN users ON posts."userId" = users.id ORDER BY posts.id DESC;`);
+    const query = await connection.query(
+      `SELECT * FROM posts JOIN users ON posts."userId" = users.id ORDER BY posts.id DESC;`
+    );
     return res.status(201).send(query.rows);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res.status(500).send({
       message:
         'An error occured while trying to fetch the posts, please refresh the page',
@@ -57,53 +70,134 @@ async function postTimeline(req, res) {
 async function getTimeline(req, res) {
   const { authorization } = req.headers;
   const token = authorization?.replace(`Bearer `, ``);
-
   try {
     const query = await getPost();
-    if(!token){
-      return res.send(query.rows);
+    if (!token) {
+      let userPosts = query.rows;
+      for (let i = 0, totalPosts = userPosts.length; i < totalPosts; i++) {
+        const originalPost = (
+          await redirectToUserRepository.getOriginalPostBySharedPostId(
+            userPosts[i].postId
+          )
+        ).rows[0];
+        if (userPosts[i].shared && originalPost) {
+          userPosts[i].message = originalPost.message;
+          userPosts[i].picture = originalPost.avatar;
+          userPosts[i].name = originalPost.username;
+          userPosts[i].SharerName = originalPost.sharerName;
+          userPosts[i].SharerId = originalPost.sharerId;
+          userPosts[i].OriginalUserId = originalPost.userId;
+        }
+
+        if (originalPost) {
+          const sharesCount = (
+            await sharedRepository.countShares(originalPost.postId)
+          ).rows[0].count;
+          userPosts[i].reshareCount = sharesCount;
+        } else {
+          userPosts[i].reshareCount = (
+            await sharedRepository.countShares(userPosts[i].postId)
+          ).rows[0].count;
+        }
+      }
+
+      return res.send(userPosts);
     }
     const user = await findUser(token);
     const userLikeList = await findUserLikes(user);
     const list = [];
     for (let index = 0; index < query.rows.length; index++) {
       const element = query.rows[index];
-      if(userLikeList[element.postId] !== 1){
-        list.push({
-          ...element,
-          isLiked: false
-        })
-      }else list.push({
-        ...element,
-          isLiked: true
-      })
+      const originalPost = (
+        await redirectToUserRepository.getOriginalPostBySharedPostId(
+          element.postId
+        )
+      ).rows[0];
+      if (element.shared) {
+        element.message = originalPost.message;
+        element.picture = originalPost.avatar;
+        element.name = originalPost.username;
+        element.SharerName = originalPost.sharerName;
+        element.SharerId = originalPost.sharerId;
+        element.OriginalUserId = originalPost.userId;
+      }
+      if (originalPost) {
+        const sharesCount = (
+          await sharedRepository.countShares(originalPost.postId)
+        ).rows[0].count;
+        element.reshareCount = sharesCount;
+
+        if (userLikeList[originalPost.postId] !== 1) {
+          list.push({
+            ...element,
+            isLiked: false,
+          });
+        } else
+          list.push({
+            ...element,
+            isLiked: true,
+          });
+      } else {
+        element.reshareCount = (
+          await sharedRepository.countShares(element.postId)
+        ).rows[0].count;
+
+        if (userLikeList[element.postId] !== 1) {
+          list.push({
+            ...element,
+            isLiked: false,
+          });
+        } else
+          list.push({
+            ...element,
+            isLiked: true,
+          });
+      }
     }
     const totalLikesList = await totalLikes();
     for (let index = 0; index < list.length; index++) {
       const element = list[index];
-      if(!totalLikesList[element.postId]){
-        list[index] = {
-          ...element,
-          totalLikes:0       
+      if (!element.shared) {
+        if (!totalLikesList[element.postId]) {
+          list[index] = {
+            ...element,
+            totalLikes: 0,
+          };
+          continue;
+        } else
+          list[index] = {
+            ...element,
+            totalLikes: totalLikesList[element.postId],
+          };
       }
-      continue
-      }else
-      list[index] = {
-          ...element,
-          totalLikes: totalLikesList[element.postId]        
+      if (element.shared) {
+        const originalPost = (
+          await redirectToUserRepository.getOriginalPostBySharedPostId(
+            element.postId
+          )
+        ).rows[0];
+        if (!totalLikesList[originalPost.postId]) {
+          list[index] = {
+            ...element,
+            totalLikes: 0,
+          };
+          continue;
+        } else
+          list[index] = {
+            ...element,
+            totalLikes: totalLikesList[originalPost.postId],
+          };
       }
     }
-    return res.send(list)
-    
+    return res.send(list);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res.status(500).send({
       message:
         'An error occured while trying to fetch the posts, please refresh the page',
     });
   }
 }
-
 
 async function getPicture(req, res) {
   try {
@@ -116,4 +210,4 @@ async function getPicture(req, res) {
     });
   }
 }
-export { postTimeline, getTimeline, getPicture};
+export { postTimeline, getTimeline, getPicture };

@@ -72,13 +72,11 @@ async function nameLikers(req, res) {
   }
 
   try {
-    console.log(postId);
     const userId = await findUser(token);
     if (!userId) {
       return res.sendStatus(401);
     }
     const nameList = await getNamePostLikers(postId);
-    console.log(req.headers);
     res.status(200).send(nameList);
   } catch (err) {
     console.log(err);

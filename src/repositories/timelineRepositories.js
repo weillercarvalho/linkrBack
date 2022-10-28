@@ -18,7 +18,6 @@ async function insertPost(message, link, useridinsert) {
 }
 
 async function getPost() {
-  //const query = await connection.query (`SELECT * FROM posts JOIN users ON posts."userId" = users.id ORDER BY posts.id DESC LIMIT 20;`);
   const query = await connection.query(`
     SELECT 
         p.id as "postId", 
@@ -27,7 +26,8 @@ async function getPost() {
         p."userId" ,  
         u."name" , 
         u.email , 
-        u.picture 
+        u.picture,
+        p.shared 
     FROM posts p 
     JOIN users u ON p."userId" = u.id 
     ORDER BY p.id DESC;`);
@@ -41,4 +41,4 @@ async function getPictures() {
   return query;
 }
 
-export { insertPost, getPost, getPictures};
+export { insertPost, getPost, getPictures };
