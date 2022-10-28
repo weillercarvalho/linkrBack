@@ -17,8 +17,16 @@ async function insertPost(message, link, useridinsert) {
   return idPost.rows[0].id;
 }
 
-async function getPost() {
-  const query = await connection.query(`
+async function getPost(limit, offset) {
+  let offsetQuery;
+  if (!offset) {
+    offsetQuery = 0;
+  } else {
+    offsetQuery = Number(offset);
+  }
+
+  const query = await connection.query(
+    `
     SELECT 
         p.id as "postId", 
         p.message , 
@@ -30,7 +38,12 @@ async function getPost() {
         p.shared 
     FROM posts p 
     JOIN users u ON p."userId" = u.id 
-    ORDER BY p.id DESC;`);
+    ORDER BY p.id DESC
+    LIMIT $1
+    OFFSET $2
+    ;`,
+    [limit, offsetQuery]
+  );
   return query;
 }
 
