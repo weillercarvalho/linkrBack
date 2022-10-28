@@ -1,6 +1,7 @@
 import {
   hashtagList,
   hashtagPosts,
+  findHashtagId,
   allPostHashRelantion,
 } from "../repositories/hashtagRepositories.js";
 import {
@@ -21,6 +22,18 @@ async function getHashtag(req, res) {
   }
 }
 
+async function getHashtagId(req, res){
+  const {name} = req.body;
+  try{
+    const id  = await findHashtagId(name);
+    res.status(200).send(id);
+
+  }catch(error){
+    console.log(err);
+    res.sendStatus(500);
+  };
+}
+
 async function getHashtagPosts(req, res) {
   const { authorization } = req.headers;
   const token = authorization?.replace(`Bearer `, ``);
@@ -36,7 +49,7 @@ async function getHashtagPosts(req, res) {
     const list = [];
     for (let index = 0; index < query.rows.length; index++) {
       const element = query.rows[index];
-      if (userLikeList[element.postId] !== 1) {
+      if (userLikeList[element.PostId] !== 1) {
         list.push({
           ...element,
           isLiked: false,
@@ -50,7 +63,7 @@ async function getHashtagPosts(req, res) {
     const totalLikesList = await totalLikes();
     for (let index = 0; index < list.length; index++) {
       const element = list[index];
-      if (!totalLikesList[element.postId]) {
+      if (!totalLikesList[element.PostId]) {
         list[index] = {
           ...element,
           totalLikes: 0,
@@ -59,7 +72,7 @@ async function getHashtagPosts(req, res) {
       } else
         list[index] = {
           ...element,
-          totalLikes: totalLikesList[element.postId],
+          totalLikes: totalLikesList[element.PostId],
         };
     }
     const relationPostHash = {};
@@ -86,7 +99,7 @@ async function getHashtagPosts(req, res) {
     const shareds = await findUserShareds(user);
     for (let index = 0; index < list.length; index++) {
       const element = list[index];
-      if (shareds[element.postId] !== 1) {
+      if (shareds[element.PostId] !== 1) {
         list[index] = {
           ...element,
           shared: false,
@@ -101,7 +114,7 @@ async function getHashtagPosts(req, res) {
     const totalSharedList = await totalShareds();
     for (let index = 0; index < list.length; index++) {
       const element = list[index];
-      if (!totalSharedList[element.postId]) {
+      if (!totalSharedList[element.PostId]) {
         list[index] = {
           ...element,
           reshareCount: 0,
@@ -110,7 +123,7 @@ async function getHashtagPosts(req, res) {
       } else
         list[index] = {
           ...element,
-          reshareCount: totalSharedList[element.postId],
+          reshareCount: totalSharedList[element.PostId],
         };
     }
 
@@ -124,4 +137,4 @@ async function getHashtagPosts(req, res) {
   }
 }
 
-export { getHashtag, getHashtagPosts };
+export { getHashtag, getHashtagPosts, getHashtagId};

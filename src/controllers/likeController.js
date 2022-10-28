@@ -6,6 +6,23 @@ import {
   getNamePostLikers,
 } from "../repositories/likeRepositories.js";
 
+async function findUserIdByToken(req,res){
+  const { authorization } = req.headers;
+  const token = authorization?.replace(`Bearer `, ``);
+
+  try {
+    const userId = await findUser(token);
+    if (!userId) {
+      return res.sendStatus(401);
+    }
+
+    return res.status(201).send({userId});
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+}
+
 async function insertLike(req, res) {
   const { authorization } = req.headers;
   const token = authorization?.replace(`Bearer `, ``);
@@ -84,4 +101,4 @@ async function nameLikers(req, res) {
   }
 }
 
-export { insertLike, dislike, nameLikers };
+export { insertLike, dislike, nameLikers, findUserIdByToken };

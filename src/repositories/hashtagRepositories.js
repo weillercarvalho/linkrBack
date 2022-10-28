@@ -39,14 +39,14 @@ async function hashtagPosts(str) {
   const list = await connection.query(
     `
     SELECT 
-    posts.id AS "postId", 
+    posts.id AS "PostId", 
     "hashtagId", 
-    message, 
-    link, 
+    message AS "Message", 
+    link AS "Link", 
     "userId", 
     email,
-    picture,
-    users.name,
+    picture AS "Avatar",
+    users.name AS "UserName",
     hashtags.name AS "hashtag"
     FROM posthashtags
     JOIN posts ON postHashtags."postId" = posts.id
@@ -76,5 +76,14 @@ async function allPostHashRelantion(){
     return list.rows
 }
 
+async function findHashtagId(str){
+  const id = await connection.query(`
+  SELECT * 
+  FROM hashtags
+  WHERE name = $1;
+  `, [str]);
+  return id.rows;
+}
 
-export {hashtagList,allPostHashRelantion, isThereHashtag, addHashtag, hashtagPosts, addRelationPostHashtag};
+
+export {hashtagList, findHashtagId, allPostHashRelantion, isThereHashtag, addHashtag, hashtagPosts, addRelationPostHashtag};
