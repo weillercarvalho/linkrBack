@@ -77,6 +77,27 @@ function deletePostBySharedPostId(postId) {
   );
 }
 
+function deleteCommentsBySharedPostId(postId) {
+  return connection.query(
+    `
+    delete from "comments" where "postId" = $1; 
+    `,
+    [postId]
+  );
+}
+
+function searchPostByPostIdAndGetAllInfo(postId) {
+  return connection.query(
+    `
+      select *  
+      from posts p
+      where p.id = $1
+      ;
+      `,
+    [postId]
+  );
+}
+
 const modUserPostRepository = {
   searchPostByPostId,
   updatePostByPostId,
@@ -85,6 +106,8 @@ const modUserPostRepository = {
   deleteShareRelation,
   deleteLikeRelation,
   deletePostBySharedPostId,
+  searchPostByPostIdAndGetAllInfo,
+  deleteCommentsBySharedPostId,
 };
 
 export default modUserPostRepository;

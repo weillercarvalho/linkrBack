@@ -1,8 +1,10 @@
 import {
   createCommentsRepositories,
   getComments,
-} from "../repositories/commentsRpositories.js";
-import { STATUS_CODE } from "../enums/statusCodes.js";
+} from '../repositories/commentsRpositories.js';
+import { STATUS_CODE } from '../enums/statusCodes.js';
+import modUserPostRepository from '../repositories/modUserPostRepository.js';
+import redirectToUserRepository from '../repositories/redirectToUserRepository.js';
 
 async function insertComments(req, res) {
   const { comment } = req.body;
@@ -11,7 +13,7 @@ async function insertComments(req, res) {
   if (!comment) {
     return res
       .status(STATUS_CODE.BAD_REQUEST)
-      .send({ error: "message invalid" });
+      .send({ error: 'message invalid' });
   }
 
   try {
@@ -31,9 +33,25 @@ async function insertComments(req, res) {
 
 async function listComments(req, res) {
   const { postId } = req.params;
-
   try {
-    const listComments = await getComments({ postId });
+    const postInfo = (
+      await modUserPostRepository.searchPostByPostIdAndGetAllInfo(postId)
+    ).rows[0];
+
+    if (postInfo.shared) {
+      console.log(postInfo);
+      const originalPost = (
+        await redirectToUserRepository.getOriginalPostBySharedPostId(
+          postInfo.id
+        )
+      ).rows[0];
+
+      listComments = await getComments(originalPost);
+
+      console.log(listComments);
+    } else {
+      listComments = await getComments({ postId });
+    }
 
     res.send(listComments);
   } catch (error) {

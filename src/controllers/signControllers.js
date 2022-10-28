@@ -1,12 +1,12 @@
-import { v4 as uuidv4 } from "uuid";
-import { connection } from "../database/db.js";
-import * as signRepositories from "../repositories/signRepositories.js";
-import bcrypt from "bcrypt";
-import { STATUS_CODE } from "../enums/statusCodes.js";
+import { v4 as uuidv4 } from 'uuid';
+import { connection } from '../database/db.js';
+import * as signRepositories from '../repositories/signRepositories.js';
+import bcrypt from 'bcrypt';
+import { STATUS_CODE } from '../enums/statusCodes.js';
 
 async function postSignup(req, res) {
   const { name, email, password, picture } = req.body;
-  console.log("entrei")
+  //console.log("entrei")
 
   try {
     const findEmail = (
@@ -15,7 +15,7 @@ async function postSignup(req, res) {
     if (findEmail.length > 0) {
       return res
         .status(STATUS_CODE.CONFLICT)
-        .send({ error: "Email already registered!" });
+        .send({ error: 'Email already registered!' });
     }
 
     const passwordEncrypted = bcrypt.hashSync(password, 10);
@@ -27,7 +27,7 @@ async function postSignup(req, res) {
       passwordEncrypted,
     });
 
-    res.status(STATUS_CODE.CREATED).send("User registered");
+    res.status(STATUS_CODE.CREATED).send('User registered');
   } catch (error) {
     console.log(error);
     res.sendStatus(500);
@@ -45,14 +45,14 @@ async function postSignin(req, res) {
     if (findUser.length === 0) {
       return res
         .status(STATUS_CODE.UNAUTHORIZED)
-        .send({ error: "Invalid email or password" });
+        .send({ error: 'Invalid email or password' });
     }
 
     const isValid = bcrypt.compareSync(password, findUser[0].password);
     if (!isValid) {
       return res
         .status(STATUS_CODE.UNAUTHORIZED)
-        .send({ error: "Invalid email or password" });
+        .send({ error: 'Invalid email or password' });
     }
 
     const existingSession = await connection.query(
