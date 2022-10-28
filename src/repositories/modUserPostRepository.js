@@ -41,10 +41,73 @@ async function deletePostByPostId(postId) {
   );
 }
 
+function isPostShared(postId) {
+  return connection.query(
+    `
+  select * from share where "originalPostId" = $1; 
+    `,
+    [postId]
+  );
+}
+
+function deleteShareRelation(postId) {
+  return connection.query(
+    `
+  delete from share where "originalPostId" = $1; 
+    `,
+    [postId]
+  );
+}
+
+function deleteLikeRelation(postId) {
+  return connection.query(
+    `
+    delete from likes where "postId" = $1; 
+    `,
+    [postId]
+  );
+}
+
+function deletePostBySharedPostId(postId) {
+  return connection.query(
+    `
+    delete from share where "sharedPostId" = $1; 
+    `,
+    [postId]
+  );
+}
+
+function deleteCommentsBySharedPostId(postId) {
+  return connection.query(
+    `
+    delete from "comments" where "postId" = $1; 
+    `,
+    [postId]
+  );
+}
+
+function searchPostByPostIdAndGetAllInfo(postId) {
+  return connection.query(
+    `
+      select *  
+      from posts p
+      where p.id = $1
+      ;
+      `,
+    [postId]
+  );
+}
+
 const modUserPostRepository = {
   searchPostByPostId,
   updatePostByPostId,
   deletePostByPostId,
+  isPostShared,
+  deleteShareRelation,
+  deleteLikeRelation,
+  deletePostBySharedPostId,
+  searchPostByPostIdAndGetAllInfo,
+  deleteCommentsBySharedPostId,
 };
 
 export default modUserPostRepository;

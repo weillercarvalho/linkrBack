@@ -53,7 +53,6 @@ function getUserIdByName(userName) {
       u.picture  
     from users u 
     where u."name" ilike $1
-    limit 6
     ;
     `,
     [userName]

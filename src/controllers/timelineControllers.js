@@ -21,11 +21,11 @@ import sharedRepository from '../repositories/shareRepository.js';
 async function postTimeline(req, res) {
   const { authorization } = req.headers;
   const { message, link, hashtags } = req.body;
+
   const token = authorization?.replace(`Bearer `, ``);
   if (!token) {
     return res.sendStatus(409);
   }
-  console.log(hashtags)
   try {
     const gettingUserId = await connection.query(
       `SELECT * FROM sessions WHERE token = $1 ORDER BY id DESC LIMIT 1`,
@@ -70,9 +70,11 @@ async function postTimeline(req, res) {
 
 async function getTimeline(req, res) {
   const { authorization } = req.headers;
+  const { limit, offset } = req.query;
+
   const token = authorization?.replace(`Bearer `, ``);
   try {
-    const query = await getPost();
+    const query = await getPost(limit, offset);
     if (!token) {
       let userPosts = query.rows;
       for (let i = 0, totalPosts = userPosts.length; i < totalPosts; i++) {
