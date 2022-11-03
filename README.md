@@ -1,4 +1,4 @@
-# Shortly BackEnd
+# Linkr BackEnd
 
 A fullstack project focused in the creation of a  social network and microblogging service, which allows users to send and receive personal updates from other contacts, via the service's website.The back-end is based on the creation of a basic API using express, PostgreSQL as a SQL database, BCrypt for hashing and some others libs as joi for validation, strip-string for data sanitization and in the arquitecture part were used routers,controllers, middlewares and repository patterns.
 
